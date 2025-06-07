@@ -76,22 +76,28 @@ def run_reduction(data_dir):
 
     # I will perform aperture photometry on this object on the reduced science images
     # The science images are split into two parts: center (indices 0-120) and off-center (indices 121-142)
-    POS_1 = [408, 412]
-    POS_2 = [482, 441]
+    POS_1 = np.array([[408, 412], [385, 526], [395, 657]])
+    POS_2 = np.array([[482, 441], [460, 559], [468, 691]])
     
     # Perform the aperture photometry
+    target_fluxes = []
+    comp_fluxes = []
     fluxes = []
     for i, _ in enumerate(reduced_science_filepath):
         temp_img = fits.getdata(reduced_science_filepath[i]).astype("f4")
 
         if i < 121:
-            positions = np.asarray(centroid_sources(temp_img, xpos=POS_1[0], ypos=POS_1[1], box_size=31, centroid_func=centroid_2dg)).reshape(1, 2)
+            positions = np.asarray(centroid_sources(temp_img, xpos=POS_1[:,0], ypos=POS_1[:,1], box_size=21, centroid_func=centroid_2dg)).T
         else:
-            positions = np.asarray(centroid_sources(temp_img, xpos=POS_2[0], ypos=POS_2[1], box_size=31, centroid_func=centroid_2dg)).reshape(1, 2)
+            positions = np.asarray(centroid_sources(temp_img, xpos=POS_2[:,0], ypos=POS_2[:,1], box_size=21, centroid_func=centroid_2dg)).T
+
+        # breakpoint()
 
         fluxes_table = do_aperture_photometry(reduced_science_filepath[i], positions, radii=[15], sky_radius_in=20, sky_annulus_width=5)
-        fluxes.append(fluxes_table["aperture_sum_0"][0])
-        print(i, science_filepaths[i], fluxes_table["aperture_sum_0"][0])
+        target_fluxes.append(fluxes_table["aperture_sum_0"][0])
+        comp_fluxes.append(np.mean([fluxes_table["aperture_sum_0"][0], fluxes_table["aperture_sum_0"][1]]))
+        fluxes.append(target_fluxes[i] / comp_fluxes[i])
+        print(i, science_filepaths[i], fluxes[i])
     
     plt.scatter(np.asarray(times) - np.min(times), fluxes)
     plt.show()
