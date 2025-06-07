@@ -12,6 +12,7 @@ from .ptc import calculate_gain, calculate_readout_noise
 from .photometry import do_aperture_photometry, plot_radial_profile
 
 import glob
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -51,9 +52,6 @@ def run_reduction(data_dir):
     median_dark = create_median_dark(dark_filepath, median_bias_filepath, median_dark_filepath)
     median_flat = create_median_flat(flat_filepath, median_bias_filepath, median_flat_filepath, median_dark_filepath)
 
-    # Plot flats
-    plot_flat(median_flat_filepath)
-
     # Calculate gain and readout noise
     gain = calculate_gain(flat_filepath)
     readout_noise = calculate_readout_noise(bias_filepath, gain)
@@ -64,26 +62,37 @@ def run_reduction(data_dir):
     # Iterate over all science
     reduced_sciences = []
     reduced_science_filepath = []
+    times = []
     for i, _ in enumerate(science_filepaths):
         reduced_science_filepath.append(data_dir + f"/reduced_science_{str(i).zfill(3)}.fits")
+        times.append(fits.getheader(science_filepaths[i])['JD-OBS'])
         # Reduce and save reduced science file to disk
-        reduced_sciences.append(reduce_science_frame(science_filepaths[i], median_bias_filepath, median_flat_filepath, 
-                                               median_dark_filepath, reduced_science_filepath[i]))
+        # Skip if already exists to save time
+        if os.path.exists(reduced_science_filepath[i]):
+            print(f"Image {reduced_science_filepath[i]} exists. Skipping...")
+        else:
+            reduced_sciences.append(reduce_science_frame(science_filepaths[i], median_bias_filepath, median_flat_filepath, 
+                                                median_dark_filepath, reduced_science_filepath[i]))
+            print(f"[info] Image {reduced_science_filepath[i]} saved!")
 
-    # I will perform aperture photometry on this object on the first reduced science image
-    # positions = [(1402.17, 1617.67)]
-    positions = [(407, 404)]
+    # I will perform aperture photometry on this object on the reduced science images
+    # The science images are split into two parts: center (indices 0-120) and off-center (indices 121-142)
+    POS_1 = [[408, 412]]
+    POS_2 = [[482, 441]]
     
     # Perform the aperture photometry
-    # fluxes_table = do_aperture_photometry(reduced_science_filepath[0], positions, radii=np.linspace(1, 30, 30), sky_radius_in=40, sky_annulus_width=5)
+    fluxes = []
     for i, _ in enumerate(reduced_science_filepath):
-        fluxes_table = do_aperture_photometry(reduced_science_filepath[i], positions, radii=[15], sky_radius_in=40, sky_annulus_width=5)
+        if i < 121:
+            positions = POS_1
+        else:
+            positions = POS_2
+
+        fluxes_table = do_aperture_photometry(reduced_science_filepath[i], positions, radii=[15], sky_radius_in=20, sky_annulus_width=5)
+        fluxes.append(fluxes_table["aperture_sum_0"][0])
         print(i, science_filepaths[i], fluxes_table["aperture_sum_0"][0])
     
-    # Clear matplotlib before plotting a new one
-    plt.clf()
-
-    # Plot radial profile based on our new fluxes table
-    plot_radial_profile(fluxes_table)
+    plt.scatter(np.asarray(times) - np.min(times), fluxes)
+    plt.show()
 
     return
