@@ -96,6 +96,9 @@ def run_reduction(data_dir):
         comp_fluxes.append(np.mean([fluxes_table["aperture_sum_0"][0], fluxes_table["aperture_sum_0"][1]]))
         fluxes.append(target_fluxes[i] / comp_fluxes[i])
         print(i, science_filepaths[i], fluxes[i])
+
+    np.save("times.npy", times)
+    np.save("fluxes.npy", fluxes)
     
     plt.scatter(np.asarray(times) - np.min(times), fluxes)
     plt.show()
