@@ -65,7 +65,7 @@ def run_reduction(data_dir):
     reduced_sciences = []
     reduced_science_filepath = []
     for i, _ in enumerate(science_filepaths):
-        reduced_science_filepath.append(data_dir + f"/reduced_science_{i}.fits")
+        reduced_science_filepath.append(data_dir + f"/reduced_science_{str(i).zfill(3)}.fits")
         # Reduce and save reduced science file to disk
         reduced_sciences.append(reduce_science_frame(science_filepaths[i], median_bias_filepath, median_flat_filepath, 
                                                median_dark_filepath, reduced_science_filepath[i]))
