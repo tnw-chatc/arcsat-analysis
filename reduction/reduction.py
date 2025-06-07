@@ -4,12 +4,12 @@
 # @Filename: reduction.py
 # @License: BSD 3-clause (http://www.opensource.org/licenses/BSD-3-Clause)
 
-from ccd.bias import create_median_bias
-from ccd.darks import create_median_dark
-from ccd.flats import create_median_flat, plot_flat
-from ccd.science import reduce_science_frame
-from ccd.ptc import calculate_gain, calculate_readout_noise
-from ccd.photometry import do_aperture_photometry, plot_radial_profile
+from .bias import create_median_bias
+from .darks import create_median_dark
+from .flats import create_median_flat, plot_flat
+from .science import reduce_science_frame
+from .ptc import calculate_gain, calculate_readout_noise
+from .photometry import do_aperture_photometry, plot_radial_profile
 
 import glob
 import numpy as np
