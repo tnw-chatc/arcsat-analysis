@@ -1,0 +1,5 @@
+*.npy
+*.fits
+*.png
+*.DS_Store
+data/
