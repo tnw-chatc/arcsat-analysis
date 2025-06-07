@@ -54,6 +54,13 @@ def run_reduction(data_dir):
     # Plot flats
     plot_flat(median_flat_filepath)
 
+    # Calculate gain and readout noise
+    gain = calculate_gain(flat_filepath)
+    readout_noise = calculate_readout_noise(bias_filepath, gain)
+
+    print(f"[info] Gain: {gain} e-/ADU")
+    print(f"[info] Readout Noise: {readout_noise} e-")
+
     # Iterate over all science
     reduced_sciences = []
     reduced_science_filepath = []
