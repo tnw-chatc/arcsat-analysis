@@ -76,8 +76,8 @@ def run_reduction(data_dir):
 
     # I will perform aperture photometry on this object on the reduced science images
     # The science images are split into two parts: center (indices 0-120) and off-center (indices 121-142)
-    POS_1 = np.array([[408, 400], [385, 526], [395, 657]])
-    POS_2 = np.array([[482, 441], [460, 559], [468, 691]])
+    POS_1 = np.array([[408, 400], [385, 526], [574, 110]])
+    POS_2 = np.array([[482, 441], [460, 559], [641, 144]])
     
     # Perform the aperture photometry
     target_fluxes = []
