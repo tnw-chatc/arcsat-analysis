@@ -24,7 +24,7 @@ def plot_light_curve(times, fluxes):
     ax.set_ylabel("Relative Flux")
     ax.grid(linestyle=":", alpha=0.5)
     
-    fig.savefig("figures/light_curve.png")
+    fig.savefig("figures/light_curve.pdf")
 
     # Clear
     plt.clf()
@@ -51,8 +51,8 @@ def determine_lc_period(times, fluxes, plot=False):
         ax.set_xlim(0, 30)
         ax.legend()
         
-        fig.savefig("figures/periodogram.png")
-        
+        fig.savefig("figures/periodogram.pdf")
+
     return lc_period
 
 
