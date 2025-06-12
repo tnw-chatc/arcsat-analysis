@@ -27,7 +27,6 @@ def plot_light_curve(times, fluxes):
     ax2 = ax.twinx()
 
     ax.scatter(tt, ff)
-    ticker = LinearLocator(8)
 
     nticks = 9
     ax.yaxis.set_major_locator(LinearLocator(nticks))
@@ -102,15 +101,30 @@ def plot_phase_folded(times, fluxes, period):
     plot_time = np.array([t.value for t in folded_tt["time"]])
 
     # Plot
-    fig, ax = plt.subplots(figsize=(8,6))
+    fig, ax = plt.subplots(figsize=(10,6))
 
     ax.scatter(plot_time, folded_tt["col0"])
-    ax.grid(linestyle=":", alpha=0.5)
+    ax2 = ax.twinx()
+
+    nticks = 9
+    ax.yaxis.set_major_locator(LinearLocator(nticks))
+    ax2.yaxis.set_major_locator(LinearLocator(nticks))
+
     ax.set_xlabel("Phase", fontsize=20)
-    ax.set_xlim(-0.5, 0.5)
     ax.set_ylabel("Relative Flux", fontsize=20)
+    ax.set_ylim(0.6, 1.0)
+    ax.set_xlim(-0.5, 0.5)
     ax.tick_params(axis='both', which='major', labelsize=16)
+    ax.grid(linestyle=":", alpha=0.5)
     
+    # Convert relative fluxes to relative magnitude
+    mag_labels = -2.5 * np.log10(np.linspace(0.6, 1.0, 9))
+    ax2.set_ylabel("Relative Magnitude", fontsize=20)
+    ax2.set_yticks(ax.get_yticks(), labels=np.round(mag_labels, 2))
+    ax2.set_ylim(0.6, 1.0)
+    ax2.tick_params(axis='both', which='major', labelsize=16)
+
+    # Clear
     fig.savefig("figures/phase_plot.pdf")
 
 
