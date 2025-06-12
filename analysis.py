@@ -50,7 +50,15 @@ def plot_light_curve(times, fluxes):
     fig, ax = plt.subplots(figsize=(10, 6))
     ax2 = ax.twinx()
 
+    # Plot the data
     ax.scatter(tt, ff)
+
+    # Plot visualization
+    ax.axhline(0.95, color="orange", linestyle="--")
+    ax.axhline(0.70, color="orange", linestyle="--")
+
+    ax.axvline(2.4, color="green", linestyle="-.")
+    ax.axvline(1.25, color="green", linestyle="-.")
 
     nticks = 9
     ax.yaxis.set_major_locator(LinearLocator(nticks))
