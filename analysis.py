@@ -36,23 +36,30 @@ def plot_light_curve(times, fluxes):
 
 def determine_lc_period(times, fluxes, plot=False):
 
+    # Convert times to hours
+    times = times.to(u.h)
+
+    # Construct the periodogram using LombScargle
     frequency, power = LombScargle(times, fluxes).autopower()
 
+    # Pick the strongest frequency
     best_freq = frequency[np.argmax(power)]
 
-    period = 1/best_freq
-
     # The actual period is twice the period of the periodiogram
-    lc_period = period.to(u.h) * 2 # type: ignore
+    period = 1/best_freq
+    lc_period = period * 2 # type: ignore
 
+    # Plot periodogram
     if plot:
         fig, ax = plt.subplots(figsize=(8,6))
 
         ax.plot(frequency, power)
-        ax.axvline(x=best_freq.value, label=period, c='orange')
-        ax.set_xlabel("Freq (1/day)")
-        ax.set_title(f"System period: {lc_period}")
-        ax.set_xlim(0, 30)
+        ax.axvline(x=best_freq.value, label="Best frequency", c='orange', linestyle="--")
+        ax.set_xlabel("Frequency ($h^{-1}$)")
+        ax.set_ylabel("Power")
+        ax.set_title(f"System period: {lc_period:.2f}")
+        ax.set_xlim(0, 8)
+        ax.grid(linestyle=":", alpha=0.5)
         ax.legend()
         
         fig.savefig("figures/periodogram.pdf")
