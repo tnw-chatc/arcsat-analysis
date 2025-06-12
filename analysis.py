@@ -48,12 +48,13 @@ def plot_light_curve(times, fluxes):
     ff = fluxes / np.max(fluxes)
 
     fig, ax = plt.subplots(figsize=(10, 6))
+    # add a second y axis (one for relative flux, the other for relative magnitude)
     ax2 = ax.twinx()
 
     # Plot the data
     ax.scatter(tt, ff)
 
-    # Plot visualization
+    # Plot visualization for determining eclipse depth and egress time.
     ax.axhline(0.95, color="orange", linestyle="--")
     ax.axhline(0.70, color="orange", linestyle="--")
 
@@ -106,7 +107,6 @@ def determine_lc_period(times, fluxes, plot=False):
         ax.axvline(x=best_freq.value, label="Best frequency", c='orange', linestyle="--")
         ax.set_xlabel("Frequency ($h^{-1}$)", fontsize=20)
         ax.set_ylabel("Power", fontsize=20)
-        ax.set_title(f"System period: {lc_period:.2f}", fontsize=24)
         ax.set_xlim(0, 6)
         ax.tick_params(axis='both', which='major', labelsize=16)
         ax.grid(linestyle=":", alpha=0.5)
@@ -126,7 +126,8 @@ def plot_phase_folded(times, fluxes, period):
     # Create a TimeSeries object for phase folding
     tt = TimeSeries(data=fluxes.reshape(-1, 1), time=Time(times.to(u.day), format='jd'))
 
-    # Phase fold using the primary eclipse as reference point
+    # Phase fold using the (primary) eclipse as reference point
+    # Use negative phase to shift the plot
     PRIMARY_ECLIPSE_PHASE = -0.255
     folded_tt = tt.fold(period.to(u.day), normalize_phase=True, epoch_phase=PRIMARY_ECLIPSE_PHASE)
 
@@ -162,15 +163,19 @@ def plot_phase_folded(times, fluxes, period):
 
 if __name__ == "__main__":
 
-    # Load the datas
+    # Load the data saved by `perform_reduction.py`
     times = (np.load("times.npy") * u.day).to(u.h) # type: ignore
     fluxes = np.load("fluxes.npy")    
 
+    # Generate the sample images
     plot_cutout()
-
+    
+    # Plot light curve
     plot_light_curve(times, fluxes)
 
+    # Determine system period and plot the periodogram
     lc_period = determine_lc_period(times, fluxes, plot=True)
-    print(lc_period)
+    print(f"System period: {lc_period}")
 
+    # Plot phase-folded light curve
     plot_phase_folded(times, fluxes, lc_period)
