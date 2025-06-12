@@ -80,8 +80,8 @@ def plot_phase_folded(times, fluxes, period):
     tt = TimeSeries(data=fluxes.reshape(-1, 1), time=Time(times.to(u.day), format='jd'))
 
     # Phase fold using the primary eclipse as reference point
-    PRIMARY_ECLIPSE_TIME = Time((np.min(times) + 1.25 * u.h).to(u.day), format="jd")
-    folded_tt = tt.fold(period.to(u.day), epoch_time = PRIMARY_ECLIPSE_TIME)
+    PRIMARY_ECLIPSE_PHASE = -0.255
+    folded_tt = tt.fold(period.to(u.day), normalize_phase=True, epoch_phase=PRIMARY_ECLIPSE_PHASE)
 
     plot_time = np.array([t.value for t in folded_tt["time"]])
 
@@ -91,7 +91,7 @@ def plot_phase_folded(times, fluxes, period):
     ax.scatter(plot_time, folded_tt["col0"])
     ax.grid(linestyle=":", alpha=0.5)
     ax.set_xlabel("Phase", fontsize=20)
-    ax.set_xlim(-1, 1)
+    ax.set_xlim(-0.5, 0.5)
     ax.set_ylabel("Relative Flux", fontsize=20)
     ax.tick_params(axis='both', which='major', labelsize=16)
     
