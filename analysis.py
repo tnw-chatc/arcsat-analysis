@@ -58,7 +58,7 @@ def plot_light_curve(times, fluxes):
     ax.axhline(0.95, color="orange", linestyle="--")
     ax.axhline(0.70, color="orange", linestyle="--")
 
-    ax.axvline(2.4, color="green", linestyle="-.")
+    ax.axvline(2.3, color="green", linestyle="-.")
     ax.axvline(1.25, color="green", linestyle="-.")
 
     nticks = 9
