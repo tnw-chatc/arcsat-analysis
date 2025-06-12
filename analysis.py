@@ -4,6 +4,7 @@ import seaborn
 import glob
 import gc
 import matplotlib.pyplot as plt
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 from astropy.timeseries import LombScargle, TimeSeries
 from astropy.time import Time
@@ -22,13 +23,28 @@ def plot_light_curve(times, fluxes):
     # Normalize flux to one
     ff = fluxes / np.max(fluxes)
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax2 = ax.twinx()
 
     ax.scatter(tt, ff)
+    ticker = LinearLocator(8)
+
+    nticks = 9
+    ax.yaxis.set_major_locator(LinearLocator(nticks))
+    ax2.yaxis.set_major_locator(LinearLocator(nticks))
+
     ax.set_xlabel("Time Since First Observation (hours)", fontsize=20)
     ax.set_ylabel("Relative Flux", fontsize=20)
+    ax.set_ylim(0.6, 1.0)
     ax.tick_params(axis='both', which='major', labelsize=16)
     ax.grid(linestyle=":", alpha=0.5)
+    
+    # Convert relative fluxes to relative magnitude
+    mag_labels = -2.5 * np.log10(np.linspace(0.6, 1.0, 9))
+    ax2.set_ylabel("Relative Magnitude", fontsize=20)
+    ax2.set_yticks(ax.get_yticks(), labels=np.round(mag_labels, 2))
+    ax2.set_ylim(0.6, 1.0)
+    ax2.tick_params(axis='both', which='major', labelsize=16)
     
     fig.savefig("figures/light_curve.pdf")
 
