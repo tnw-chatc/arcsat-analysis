@@ -4,6 +4,7 @@ import seaborn
 import glob
 import gc
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
 from astropy.io import fits
@@ -33,6 +34,13 @@ def plot_cutout():
         norm = ImageNormalize(images[i], interval=ZScaleInterval(), stretch=LinearStretch())
         ax.imshow(images[i], norm=norm, origin="lower")
         ax.axis('off')
+
+    # Draw circles to show comp objects
+    circle_1 = patches.Circle((385, 519), 15, fill=False, color="magenta")
+    circle_2 = patches.Circle((568, 102), 15, fill=False, color="magenta")
+
+    axes[1].add_patch(circle_1)
+    axes[1].add_patch(circle_2)
 
     fig.savefig("figures/cutouts.pdf")
 
