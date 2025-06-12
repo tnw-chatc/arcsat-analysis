@@ -16,7 +16,7 @@ def plot_light_curve(times, fluxes):
 
     # Convert JD to hours from the first observation
     # Offset the time such that the first data point is zero
-    tt = (times - np.min(times)).to(u.h)
+    tt = (times - np.min(times))
 
     # Normalize flux to one
     ff = fluxes / np.max(fluxes)
@@ -36,9 +36,6 @@ def plot_light_curve(times, fluxes):
 
 
 def determine_lc_period(times, fluxes, plot=False):
-
-    # Convert times to hours
-    times = times.to(u.h)
 
     # Construct the periodogram using LombScargle
     frequency, power = LombScargle(times, fluxes).autopower()
@@ -72,7 +69,7 @@ def determine_lc_period(times, fluxes, plot=False):
 if __name__ == "__main__":
 
     # Load the datas
-    times = np.load("times.npy") * u.day # type: ignore
+    times = (np.load("times.npy") * u.day).to(u.h) # type: ignore
     fluxes = np.load("fluxes.npy")    
 
     plot_light_curve(times, fluxes)
