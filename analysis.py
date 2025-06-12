@@ -24,8 +24,9 @@ def plot_light_curve(times, fluxes):
     fig, ax = plt.subplots(figsize=(8, 6))
 
     ax.scatter(tt, ff)
-    ax.set_xlabel("Time Since First Observation (hours)")
-    ax.set_ylabel("Relative Flux")
+    ax.set_xlabel("Time Since First Observation (hours)", fontsize=20)
+    ax.set_ylabel("Relative Flux", fontsize=20)
+    ax.tick_params(axis='both', which='major', labelsize=16)
     ax.grid(linestyle=":", alpha=0.5)
     
     fig.savefig("figures/light_curve.pdf")
@@ -55,12 +56,13 @@ def determine_lc_period(times, fluxes, plot=False):
 
         ax.plot(frequency, power)
         ax.axvline(x=best_freq.value, label="Best frequency", c='orange', linestyle="--")
-        ax.set_xlabel("Frequency ($h^{-1}$)")
-        ax.set_ylabel("Power")
-        ax.set_title(f"System period: {lc_period:.2f}")
-        ax.set_xlim(0, 8)
+        ax.set_xlabel("Frequency ($h^{-1}$)", fontsize=20)
+        ax.set_ylabel("Power", fontsize=20)
+        ax.set_title(f"System period: {lc_period:.2f}", fontsize=24)
+        ax.set_xlim(0, 6)
+        ax.tick_params(axis='both', which='major', labelsize=16)
         ax.grid(linestyle=":", alpha=0.5)
-        ax.legend()
+        ax.legend(fontsize=20)
         
         fig.savefig("figures/periodogram.pdf")
 
