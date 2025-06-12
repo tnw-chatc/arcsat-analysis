@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 
 from astropy.io import fits
 from photutils.centroids import centroid_sources, centroid_2dg, centroid_quadratic
+from astropy.stats import sigma_clipped_stats
 
 import pdb
 
@@ -64,7 +65,7 @@ def run_reduction(data_dir):
     times = []
     for i, _ in enumerate(science_filepaths):
         reduced_science_filepath.append(data_dir + f"/reduced_science_{str(i).zfill(3)}.fits")
-        times.append(fits.getheader(science_filepaths[i])['JD-OBS'])
+        times.append(fits.getheader(science_filepaths[i])['JD-OBS']) # TODO: check if really works
         # Reduce and save reduced science file to disk
         # Skip if already exists to save time
         if os.path.exists(reduced_science_filepath[i]):
@@ -84,12 +85,14 @@ def run_reduction(data_dir):
     comp_fluxes = []
     fluxes = []
     for i, _ in enumerate(reduced_science_filepath):
-        temp_img = fits.getdata(reduced_science_filepath[i]).astype("f4")
+        temp_img = fits.getdata(reduced_science_filepath[i]).astype("f4") # type: ignore
+
+        mean, median, std = sigma_clipped_stats(temp_img, sigma=2.5)
 
         if i < 121:
-            positions = np.asarray(centroid_sources(temp_img, xpos=POS_1[:,0], ypos=POS_1[:,1], box_size=35, centroid_func=centroid_2dg)).T
+            positions = np.asarray(centroid_sources(temp_img - median, xpos=POS_1[:,0], ypos=POS_1[:,1], box_size=27, centroid_func=centroid_2dg)).T
         else:
-            positions = np.asarray(centroid_sources(temp_img, xpos=POS_2[:,0], ypos=POS_2[:,1], box_size=35, centroid_func=centroid_2dg)).T
+            positions = np.asarray(centroid_sources(temp_img - median, xpos=POS_2[:,0], ypos=POS_2[:,1], box_size=27, centroid_func=centroid_2dg)).T
 
         fluxes_table = do_aperture_photometry(reduced_science_filepath[i], positions, radii=[15], sky_radius_in=20, sky_annulus_width=5)
         target_fluxes.append(fluxes_table["aperture_sum_0"][0])
