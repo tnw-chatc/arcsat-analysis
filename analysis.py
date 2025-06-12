@@ -31,7 +31,7 @@ def plot_cutout():
     fig, axes = plt.subplots(1, 3, layout='constrained', figsize=(10,3))
     for i, ax in enumerate(axes):
         norm = ImageNormalize(images[i], interval=ZScaleInterval(), stretch=LinearStretch())
-        ax.imshow(images[i], norm=norm)
+        ax.imshow(images[i], norm=norm, origin="lower")
         ax.axis('off')
 
     fig.savefig("figures/cutouts.pdf")
@@ -160,9 +160,9 @@ if __name__ == "__main__":
 
     plot_cutout()
 
-    # plot_light_curve(times, fluxes)
+    plot_light_curve(times, fluxes)
 
-    # lc_period = determine_lc_period(times, fluxes, plot=True)
-    # print(lc_period)
+    lc_period = determine_lc_period(times, fluxes, plot=True)
+    print(lc_period)
 
-    # plot_phase_folded(times, fluxes, lc_period)
+    plot_phase_folded(times, fluxes, lc_period)
