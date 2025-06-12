@@ -99,7 +99,7 @@ def run_reduction(data_dir):
         target_fluxes.append(fluxes_table["aperture_sum_0"][0])
         comp_fluxes.append(np.mean([fluxes_table["aperture_sum_0"][1], fluxes_table["aperture_sum_0"][2]]))
         fluxes.append(target_fluxes[i] / comp_fluxes[i])
-        print(i, positions, science_filepaths[i], fluxes[i])
+        print(i, science_filepaths[i], fluxes[i], target_fluxes[i])
 
     np.save("times.npy", times)
     np.save("fluxes.npy", fluxes)
