@@ -8,19 +8,23 @@ import matplotlib.pyplot as plt
 from astropy.timeseries import LombScargle
 import astropy.units as u
 
-from scipy.fft import rfft
+import pdb
 
 
 def plot_light_curve(times, fluxes):
     """Plot the light curve obtained from the reduction process"""
 
-    # Convert JD to MJD
-    times_mjd = np.asarray(times) - 2400000.5
+    # Convert JD to hours from the first observation
+    # Offset the time such that the first data point is zero
+    tt = (times - np.min(times)).to(u.h)
+
+    # Normalize flux to one
+    ff = fluxes / np.max(fluxes)
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    ax.scatter(times_mjd, fluxes)
-    ax.set_xlabel("time")
+    ax.scatter(tt, ff)
+    ax.set_xlabel("Time Since First Observation (hours)")
     ax.set_ylabel("Relative Flux")
     ax.grid(linestyle=":", alpha=0.5)
     
