@@ -77,7 +77,7 @@ def run_reduction(data_dir):
 
     # I will perform aperture photometry on this object on the reduced science images
     # The science images are split into two parts: center (indices 0-120) and off-center (indices 121-142)
-    POS_1 = np.array([[409, 412], [385, 526], [574, 110]])
+    POS_1 = np.array([[409, 412], [385, 526], [566, 112]])
     POS_2 = np.array([[482, 441], [460, 559], [641, 144]])
     
     # Perform the aperture photometry
@@ -87,18 +87,19 @@ def run_reduction(data_dir):
     for i, _ in enumerate(reduced_science_filepath):
         temp_img = fits.getdata(reduced_science_filepath[i]).astype("f4") # type: ignore
 
-        mean, median, std = sigma_clipped_stats(temp_img, sigma=2.5)
+        mean, median, std = sigma_clipped_stats(temp_img, sigma=3.0)
 
         if i < 121:
-            positions = np.asarray(centroid_sources(temp_img - median, xpos=POS_1[:,0], ypos=POS_1[:,1], box_size=35, centroid_func=centroid_2dg)).T
+            positions = np.asarray(centroid_sources(temp_img - median, xpos=POS_1[:,0], ypos=POS_1[:,1], box_size=39, centroid_func=centroid_quadratic)).T
         else:
-            positions = np.asarray(centroid_sources(temp_img - median, xpos=POS_2[:,0], ypos=POS_2[:,1], box_size=35, centroid_func=centroid_2dg)).T
+            positions = np.asarray(centroid_sources(temp_img - median, xpos=POS_2[:,0], ypos=POS_2[:,1], box_size=39, centroid_func=centroid_quadratic)).T
 
-        fluxes_table = do_aperture_photometry(reduced_science_filepath[i], positions, radii=[10], sky_radius_in=15, sky_annulus_width=5)
+        fluxes_table = do_aperture_photometry(reduced_science_filepath[i], positions, radii=[15], sky_radius_in=30, sky_annulus_width=10)
+        # breakpoint()
         target_fluxes.append(fluxes_table["aperture_sum_0"][0])
-        comp_fluxes.append(np.mean([fluxes_table["aperture_sum_0"][0], fluxes_table["aperture_sum_0"][1]]))
+        comp_fluxes.append(np.mean([fluxes_table["aperture_sum_0"][1], fluxes_table["aperture_sum_0"][2]]))
         fluxes.append(target_fluxes[i] / comp_fluxes[i])
-        print(i, science_filepaths[i], fluxes[i])
+        print(i, positions, science_filepaths[i], fluxes[i])
 
     np.save("times.npy", times)
     np.save("fluxes.npy", fluxes)
