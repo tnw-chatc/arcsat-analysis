@@ -6,11 +6,35 @@ import gc
 import matplotlib.pyplot as plt
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 
+from astropy.io import fits
+from astropy.visualization import ImageNormalize, LinearStretch, ZScaleInterval
 from astropy.timeseries import LombScargle, TimeSeries
 from astropy.time import Time
 import astropy.units as u
 
 import pdb
+
+
+def plot_cutout():
+    """Plot 3 cutouts of the image of given index
+    
+    Pretty hardcoded. For visualization only."""
+
+    images = []
+    
+    # Raw science, reduced science, reduced off-centered science
+    images.append(fits.getdata("data/LPSEB35_g_20250530_034359.fits").astype("f4"))
+    images.append(fits.getdata("data/reduced_science_000.fits").astype("f4"))
+    images.append(fits.getdata("data/reduced_science_130.fits").astype("f4"))
+
+    # Plotting
+    fig, axes = plt.subplots(1, 3, layout='constrained', figsize=(10,3))
+    for i, ax in enumerate(axes):
+        norm = ImageNormalize(images[i], interval=ZScaleInterval(), stretch=LinearStretch())
+        ax.imshow(images[i], norm=norm)
+        ax.axis('off')
+
+    fig.savefig("figures/cutouts.pdf")
 
 
 def plot_light_curve(times, fluxes):
@@ -134,9 +158,11 @@ if __name__ == "__main__":
     times = (np.load("times.npy") * u.day).to(u.h) # type: ignore
     fluxes = np.load("fluxes.npy")    
 
-    plot_light_curve(times, fluxes)
+    plot_cutout()
 
-    lc_period = determine_lc_period(times, fluxes, plot=True)
-    print(lc_period)
+    # plot_light_curve(times, fluxes)
 
-    plot_phase_folded(times, fluxes, lc_period)
+    # lc_period = determine_lc_period(times, fluxes, plot=True)
+    # print(lc_period)
+
+    # plot_phase_folded(times, fluxes, lc_period)
